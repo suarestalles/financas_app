@@ -4,6 +4,13 @@ void main() {
   runApp(const MyApp());
 }
 
+List<String> contas = [
+  'Teste',
+  'Teste',
+  'Teste',
+  'Teste',
+];
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -24,6 +31,11 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.white,
           backgroundColor: Colors.green,
         ),
+        body: ListView.builder(
+          itemCount: contas.length,
+          itemBuilder: (context, index) {
+            return Text(contas[index]);
+          }),
       ),
     );
   }
