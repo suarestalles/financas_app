@@ -1,4 +1,4 @@
-# financas_app
+# financas_pessoais_flutter
 
 A new Flutter project.
 

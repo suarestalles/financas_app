@@ -1,42 +1,30 @@
+import 'package:financas_pessoais_flutter/modules/categoria/controllers/categoria_controller.dart';
+import 'package:financas_pessoais_flutter/modules/categoria/pages/categoria_list_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => CategoriaController(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
-
-List<String> contas = [
-  'Teste',
-  'Teste',
-  'Teste',
-  'Teste',
-];
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'App Finanças',
       debugShowCheckedModeBanner: false,
-      title: 'Finanças',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: Scaffold(
-        drawer: const Drawer(),
-        appBar: AppBar(
-          title: const Text('Minhas Finanças'),
-          foregroundColor: Colors.white,
-          backgroundColor: Colors.green,
-        ),
-        body: ListView.builder(
-          itemCount: contas.length,
-          itemBuilder: (context, index) {
-            return Text(contas[index]);
-          }),
-      ),
+      home: CategoriaListPage(),
     );
   }
 }

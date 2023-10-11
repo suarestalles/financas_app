@@ -14,8 +14,7 @@ Content-Type: application/json
     "data": "2023-09-26",
     "descricao": "Dipirona",
     "valor": 6.20,
-    "destinoOrigem": "Farmácia Popular",
+    "destinoOrigem": "Farmacia do Zé",
     "status": false
 }
 
-###
