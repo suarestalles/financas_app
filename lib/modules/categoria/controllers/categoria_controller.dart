@@ -7,14 +7,7 @@ import 'package:flutter/material.dart';
 
 class CategoriaController extends ChangeNotifier {
 
-  //   var categorias = [
-  //   Categoria(
-  //     nome: "FARMACIA",
-  //   ),
-  //   Categoria(
-  //     nome: "MERCADO",
-  //   ),
-  // ];
+  List<Categoria> categorias = [];
 
   create(BuildContext context) {
     final formKey = GlobalKey<FormState>();
@@ -45,12 +38,12 @@ class CategoriaController extends ChangeNotifier {
         ),
         actions: [
           ElevatedButton.icon(
-            onPressed: () {
+            onPressed: () async {
               if(formKey.currentState?.validate() ?? false) {
                 var categoria = Categoria(nome: nomeController.text);
-                // categorias.add(categoria);
-                Navigator.of(context).pop();
+                await save(categoria);
                 notifyListeners();
+                Navigator.of(context).pop();
               }
             },
             icon: const Icon(Icons.save),
@@ -67,9 +60,27 @@ class CategoriaController extends ChangeNotifier {
       final response = await categoriaRepository
           .getAll(BackRoutes.baseUrl + BackRoutes.CATEGORIA_ALL);
       if (response != null) {
-        List<Categoria> categorias =
+        List<Categoria> lista =
             response.map<Categoria>((e) => Categoria.fromMap(e)).toList();
+            categorias = lista;
         return categorias;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return null;
+  }
+
+  Future<void> save(Categoria categoria) async {
+    var categoriaRepository = CategoriaRepository();
+    try {
+      final response = await categoriaRepository.save(
+          BackRoutes.baseUrl + BackRoutes.CATEGORIA_SAVE, categoria);
+      if (response != null) {
+        Categoria categoria =
+            Categoria.fromMap(response as Map<String, dynamic>);
+        categorias.add(categoria);
+        log(categorias.length.toString());
       }
     } catch (e) {
       log(e.toString());
