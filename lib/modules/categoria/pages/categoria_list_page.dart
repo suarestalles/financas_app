@@ -27,10 +27,9 @@ class CategoriaListPage extends StatelessWidget {
                       padding:
                           EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: CircleAvatar(
-                        radius: 50,
-                        backgroundImage:
-                            NetworkImage('assets/images/avatar.png'),
-                      ),
+                          radius: 50,
+                          backgroundImage:
+                              AssetImage('assets/images/avatar.jpg')),
                     ),
                     Center(
                       child: Text(
@@ -58,12 +57,24 @@ class CategoriaListPage extends StatelessWidget {
                   itemBuilder: (ctx, index) => Card(
                     child: ListTile(
                       title: Text(data[index].nome),
-                      trailing: const IconButton(
-                        onPressed: null,
-                        icon: Icon(
-                          Icons.delete,
-                          color: Colors.red,
-                        ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () => controller.edit(context, data[index]),
+                            icon: const Icon(
+                              Icons.edit,
+                              color: Colors.amber,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => controller.delete(data[index]),
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -81,7 +92,7 @@ class CategoriaListPage extends StatelessWidget {
           },
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => controller.create(context),
+          onPressed: () => controller.create(context, oldCategoria: null),
           child: const Icon(Icons.book),
         ));
   }

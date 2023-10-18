@@ -9,14 +9,14 @@ class CategoriaController extends ChangeNotifier {
 
   List<Categoria> categorias = [];
 
-  create(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
-    final nomeController = TextEditingController();
+  create(BuildContext context, {Categoria? oldCategoria}) {
+    var formKey = GlobalKey<FormState>();
+    var nomeController = TextEditingController(text: oldCategoria?.nome);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(
-          'Nova Categoria',
+        title: Text(
+          oldCategoria == null ? 'Nova Categoria' : 'Editar Categoria',
           textAlign: TextAlign.center,
         ),
         content: Form(
@@ -40,14 +40,16 @@ class CategoriaController extends ChangeNotifier {
           ElevatedButton.icon(
             onPressed: () async {
               if(formKey.currentState?.validate() ?? false) {
-                var categoria = Categoria(nome: nomeController.text);
-                await save(categoria);
+                var categoria = Categoria(nome: nomeController.text)..id = oldCategoria?.id;
+                oldCategoria == null
+                  ? await save(categoria)
+                  : await update(categoria);
                 notifyListeners();
                 Navigator.of(context).pop();
               }
             },
             icon: const Icon(Icons.save),
-            label: const Text('Salvar'),
+            label: Text(oldCategoria == null ? 'Salvar' : 'Atualizar'),
           ),
         ],
       ),
@@ -85,5 +87,41 @@ class CategoriaController extends ChangeNotifier {
     } catch (e) {
       log(e.toString());
     }
+  }
+
+  Future<void> delete(Categoria categoria) async {
+    var categoriaRepository = CategoriaRepository();
+    try {
+      final response = await categoriaRepository.delete(
+          BackRoutes.baseUrl + BackRoutes.CATEGORIA_DELETE, categoria);
+      if (response != null) {
+        categorias.remove(categoria);
+        notifyListeners();
+        log(categorias.length.toString());
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Future<void> update(Categoria categoria) async {
+    var categoriaRepository = CategoriaRepository();
+    try {
+      final response = await categoriaRepository.update(
+          BackRoutes.baseUrl + BackRoutes.CATEGORIA_UPDATE, categoria);
+      if (response != null) {
+        Categoria newCategoria =
+            Categoria.fromMap(response as Map<String, dynamic>);
+        categorias.add(newCategoria);
+        categorias.remove(categoria);
+        log(categorias.length.toString());
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  edit(BuildContext context, Categoria categoria) async {
+    create(context, oldCategoria: categoria);
   }
 }
