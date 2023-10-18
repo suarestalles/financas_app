@@ -36,60 +36,81 @@ class ContaController extends ChangeNotifier {
         ),
         content: Form(
           key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField(
-                  items:
-                      Provider.of<CategoriaController>(context, listen: false)
-                          .categorias
-                          .map(
-                            (e) => DropdownMenuItem<Categoria>(
-                              child: Text(e.nome),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (value) {
-                    categoriaSelected = value;
-                  }),
-              RadioListTile(value: true, groupValue: tipoSelected, onChanged: (value) => tipoSelected = value!, title: const Text('Despesa'),),
-              RadioListTile(value: false, groupValue: tipoSelected, onChanged: (value) => tipoSelected = value!, title: const Text('Receita'),),
-              // showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(1970), lastDate: DateTime(2100)),
-              TextFormField(
-                controller: descricaoController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Campo Obrigatório!';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: valorController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Campo Obrigatório!';
-                  }
-                  return null;
-                },
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-              ),
-              TextFormField(
-                controller: destinoOrigemController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Campo Obrigatório!';
-                  }
-                  return null;
-                },
-              ),
-              RadioListTile(value: true, groupValue: statusSelected, onChanged: (value) => statusSelected = value!, title: const Text('Pago'),),
-              RadioListTile(value: false, groupValue: statusSelected, onChanged: (value) => statusSelected = value!, title: const Text('Pendente'),),
-              
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField(
+                    items:
+                        Provider.of<CategoriaController>(context, listen: false)
+                            .categorias
+                            .map(
+                              (e) => DropdownMenuItem<Categoria>(
+                                child: Text(e.nome),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      categoriaSelected = value;
+                    }),
+                RadioListTile(
+                  value: true,
+                  groupValue: tipoSelected,
+                  onChanged: (value) => tipoSelected = value!,
+                  title: const Text('Despesa'),
+                ),
+                RadioListTile(
+                  value: false,
+                  groupValue: tipoSelected,
+                  onChanged: (value) => tipoSelected = value!,
+                  title: const Text('Receita'),
+                ),
+                // showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(1970), lastDate: DateTime(2100)),
+                TextFormField(
+                  controller: descricaoController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Campo Obrigatório!';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: valorController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Campo Obrigatório!';
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                ),
+                TextFormField(
+                  controller: destinoOrigemController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Campo Obrigatório!';
+                    }
+                    return null;
+                  },
+                ),
+                RadioListTile(
+                  value: statusSelected,
+                  groupValue: statusSelected,
+                  onChanged: (value) => statusSelected = value!,
+                  title: const Text('Pago'),
+                ),
+                RadioListTile(
+                  value: statusSelected,
+                  groupValue: statusSelected,
+                  onChanged: (value) => statusSelected = value!,
+                  title: const Text('Pendente'),
+                ),
+              ],
+            ),
           ),
         ),
         actions: [
@@ -104,11 +125,8 @@ class ContaController extends ChangeNotifier {
                   valor: double.parse(valorController.text),
                   destinoOrigem: destinoOrigemController.text,
                   status: statusSelected,
-                  )
-                  ..id = oldConta?.id;
-                oldConta == null
-                    ? await save(conta)
-                    : await update(conta);
+                )..id = oldConta?.id;
+                oldConta == null ? await save(conta) : await update(conta);
                 notifyListeners();
                 Navigator.of(context).pop();
               }
@@ -144,8 +162,7 @@ class ContaController extends ChangeNotifier {
       final response = await contaRepository.save(
           BackRoutes.baseUrl + BackRoutes.CONTA_SAVE, conta);
       if (response != null) {
-        Conta conta =
-            Conta.fromMap(response as Map<String, dynamic>);
+        Conta conta = Conta.fromMap(response as Map<String, dynamic>);
         contas.add(conta);
         log(contas.length.toString());
       }
@@ -175,8 +192,7 @@ class ContaController extends ChangeNotifier {
       final response = await contaRepository.update(
           BackRoutes.baseUrl + BackRoutes.CONTA_UPDATE, conta);
       if (response != null) {
-        Conta newConta =
-            Conta.fromMap(response as Map<String, dynamic>);
+        Conta newConta = Conta.fromMap(response as Map<String, dynamic>);
         contas.add(newConta);
         contas.remove(conta);
         log(contas.length.toString());
