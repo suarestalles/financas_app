@@ -1,5 +1,6 @@
 import 'package:financas_pessoais_flutter/modules/categoria/controllers/categoria_controller.dart';
 import 'package:financas_pessoais_flutter/modules/categoria/models/categoria_model.dart';
+import 'package:financas_pessoais_flutter/modules/conta/pages/conta_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,29 +20,43 @@ class CategoriaListPage extends StatelessWidget {
         drawer: Drawer(
           child: Column(
             children: [
-              Container(
-                color: Colors.amber,
-                child: const Row(
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage:
-                              AssetImage('assets/images/avatar.jpg')),
-                    ),
-                    Center(
-                      child: Text(
-                        'Bem-Vindo',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
+              Row(
+                children: [
+                  Container(
+                    color: Colors.amber,
+                    child: const Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: CircleAvatar(
+                              radius: 50,
+                              backgroundImage:
+                                  AssetImage('assets/images/avatar.jpg')),
                         ),
-                      ),
+                        Center(
+                          child: Text(
+                            'Bem-Vindo',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+              MenuItemButton(
+                style: const ButtonStyle(padding: MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 20, horizontal: 20))),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CategoriaListPage())),
+                child: const Text('Categorias'),
+              ),
+              MenuItemButton(
+                style: const ButtonStyle(padding: MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 20, horizontal: 20))),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ContaListPage())),
+                child: const Text('Contas'),
               ),
             ],
           ),
@@ -61,7 +76,8 @@ class CategoriaListPage extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            onPressed: () => controller.edit(context, data[index]),
+                            onPressed: () =>
+                                controller.edit(context, data[index]),
                             icon: const Icon(
                               Icons.edit,
                               color: Colors.amber,
