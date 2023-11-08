@@ -1,7 +1,6 @@
 import 'package:financas_pessoais_flutter/modules/categoria/controllers/categoria_controller.dart';
-import 'package:financas_pessoais_flutter/modules/categoria/pages/categoria_list_page.dart';
 import 'package:financas_pessoais_flutter/modules/conta/controllers/conta_controller.dart';
-// import 'package:financas_pessoais_flutter/modules/conta/pages/conta_list_page.dart';
+import 'package:financas_pessoais_flutter/modules/page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,10 +25,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'App Finanças',
       debugShowCheckedModeBanner: false,
-      home: CategoriaListPage(),
+      home: HomePage(),
     );
   }
 }

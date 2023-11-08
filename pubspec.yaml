@@ -16,6 +16,7 @@ dependencies:
   brasil_fields: ^1.14.0
   intl: ^0.18.1
   validatorless: ^1.2.3
+  fl_chart: ^0.64.0
 
 dev_dependencies:
   flutter_test:

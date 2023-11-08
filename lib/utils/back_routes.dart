@@ -13,4 +13,5 @@ class BackRoutes {
   static const CONTA_SAVE = '/conta/save';
   static const CONTA_DELETE = '/conta/delete';
   static const CONTA_UPDATE = '/conta/update';
+  static const CONTA_RESUMO = '/conta/resumo';
 }

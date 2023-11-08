@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:financas_pessoais_flutter/modules/categoria/controllers/categoria_controller.dart';
 import 'package:financas_pessoais_flutter/modules/categoria/models/categoria_model.dart';
+import 'package:financas_pessoais_flutter/modules/conta/models/conta_dto.dart';
 import 'package:financas_pessoais_flutter/modules/conta/models/conta_model.dart';
 import 'package:financas_pessoais_flutter/modules/conta/repository/conta_repository.dart';
 import 'package:financas_pessoais_flutter/utils/back_routes.dart';
@@ -344,6 +345,21 @@ class ContaController extends ChangeNotifier {
     } catch (e) {
       log(e.toString());
     }
+  }
+
+  Future<ContaDTO?> resumo() async {
+    var contaRepository = ContaRepository();
+    try {
+      final response = await contaRepository
+          .resumo(BackRoutes.baseUrl + BackRoutes.CONTA_RESUMO);
+      if (response != null) {
+        ContaDTO contaDTO = ContaDTO.fromMap(response);
+        return contaDTO;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return null;
   }
 
   edit(BuildContext context, Conta conta) async {

@@ -1,4 +1,3 @@
-import 'package:financas_pessoais_flutter/modules/categoria/pages/categoria_list_page.dart';
 import 'package:financas_pessoais_flutter/modules/conta/controllers/conta_controller.dart';
 import 'package:financas_pessoais_flutter/modules/conta/models/conta_model.dart';
 import 'package:flutter/material.dart';
@@ -16,50 +15,6 @@ class ContaListPage extends StatelessWidget {
           backgroundColor: Colors.black,
           foregroundColor: Colors.lightBlueAccent,
           centerTitle: true,
-        ),
-        drawer: Drawer(
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    color: Colors.amber,
-                    child: const Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          child: CircleAvatar(
-                              radius: 50,
-                              backgroundImage:
-                                  AssetImage('assets/images/avatar.jpg')),
-                        ),
-                        Center(
-                          child: Text(
-                            'Bem-Vindo',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              MenuItemButton(
-                style: const ButtonStyle(padding: MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 20, horizontal: 20))),
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CategoriaListPage())),
-                child: const Text('Categorias'),
-              ),
-              MenuItemButton(
-                style: const ButtonStyle(padding: MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 20, horizontal: 20))),
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ContaListPage())),
-                child: const Text('Contas'),
-              ),
-            ],
-          ),
         ),
         body: FutureBuilder(
           future: controller.findAll(),
