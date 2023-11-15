@@ -11,14 +11,14 @@ import 'package:financas_pessoais_flutter/utils/utils.dart';
 import 'package:financas_pessoais_flutter/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:validatorless/validatorless.dart';
 
 class ContaController extends ChangeNotifier {
   List<Conta> contas = [];
   Categoria? categoriaSelected;
-  String tipoSelected = 'Despesa';
-  String groupValueTipoConta = "TipoConta";
+  String? tipoSelected;
   final dataController = TextEditingController();
   final descricaoController = TextEditingController();
   final valorController = TextEditingController();
@@ -30,11 +30,17 @@ class ContaController extends ChangeNotifier {
 
   create(BuildContext context, {Conta? oldConta}) async {
     final formKey = GlobalKey<FormState>();
+    categoriaSelected = oldConta?.categoria;
+    tipoSelected = oldConta?.tipo == false ? 'Receita' : 'Despesa';
+    dataController.text = oldConta?.data == null ? '' : Utils.convertDate(oldConta!.data);
+    descricaoController.text = oldConta?.descricao ?? '';
+    valorController.text = oldConta?.valor == null ? '' : UtilBrasilFields.obterReal(oldConta!.valor);
+    destinoOrigemController.text = oldConta?.destinoOrigem ?? '';
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(
-          'Nova Conta',
+        title: Text(oldConta == null ? 'Nova Conta' :
+          'Editando Conta',
           textAlign: TextAlign.center,
         ),
         content: SingleChildScrollView(
@@ -43,36 +49,6 @@ class ContaController extends ChangeNotifier {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                FutureBuilder<List<Categoria>?>(
-                  future: Provider.of<CategoriaController>(context, 
-                  listen: false).findAll(),
-                  builder: (context, snapshot) {
-                    if(snapshot.connectionState == ConnectionState.done){
-                      var categorias = snapshot.data!;
-                    return DropdownButtonFormField(
-                      items: categorias.map((e) => 
-                      DropdownMenuItem<Categoria>(
-                          value: e,
-                          child: Text(e.nome),
-                        ),
-                      ).toList(),
-                      onChanged: (value) {
-                        categoriaSelected = value;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Categorias',
-                      ),
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Campo Obrigatório!';
-                        }
-                        return null;
-                      }
-                    );
-                    }
-                    return const CircularProgressIndicator();
-                  }
-                ),
                 DropdownButtonFormField(
                   decoration: const InputDecoration(
                     hintText: 'Tipo de Conta',
@@ -92,36 +68,72 @@ class ContaController extends ChangeNotifier {
                     notifyListeners();
                   },
                   validator: Validatorless.required('Campo Obrigatório!'),
+                  value: tipoSelected,
                 ),
+                FutureBuilder<List<Categoria>?>(
+                    future:
+                        Provider.of<CategoriaController>(context, listen: false)
+                            .findAll(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        var categorias = snapshot.data!;
+                        return DropdownButtonFormField(
+                          value: categoriaSelected != null ? categorias.firstWhere((element) => element.id == categoriaSelected?.id) : null,
+                          items: categorias
+                              .map(
+                                (e) => DropdownMenuItem<Categoria>(
+                                  value: e,
+                                  child: Text(e.nome),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            categoriaSelected = value;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Categorias',
+                          ),
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Campo Obrigatório!';
+                            }
+                            return null;
+                          },
+                        );
+                      }
+                      return const CircularProgressIndicator();
+                    }),
                 TextFormField(
                   controller: dataController,
                   decoration: InputDecoration(
-                    hintText: Provider.of<ContaController>(context).tipoSelected == 'Despesa' ? 'Data Pagamento' : 'Data Recebimento',
+                    hintText:
+                        Provider.of<ContaController>(context).tipoSelected ==
+                                'Despesa'
+                            ? 'Data Pagamento'
+                            : 'Data Recebimento',
                   ),
                   validator: Validatorless.required('Campo Obrigatório!'),
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                     DataInputFormatter(),
                   ],
+                  onTap: () {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    selecionarData(context);
+                  }
                 ),
                 TextFormField(
                   controller: descricaoController,
-                  decoration: const InputDecoration(
-                    hintText: 'Descrição'
-                  ),
+                  decoration: const InputDecoration(hintText: 'Descrição'),
                   validator: Validatorless.required('Campo Obrigatório!'),
                 ),
                 TextFormField(
                   controller: valorController,
-                  decoration: const InputDecoration(
-                    hintText: 'Valor'
-                  ),
-                  validator: Validatorless.multiple(
-                    [
-                      Validatorless.required('Campo Obrigatório!'),
-                      Validators.minDouble(0.01, 'Valor Inválido!')
-                    ]
-                  ),
+                  decoration: const InputDecoration(hintText: 'Valor'),
+                  validator: Validatorless.multiple([
+                    Validatorless.required('Campo Obrigatório!'),
+                    Validators.minDouble(0.01, 'Valor Inválido!')
+                  ]),
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                     CentavosInputFormatter(casasDecimais: 2),
@@ -130,11 +142,14 @@ class ContaController extends ChangeNotifier {
                 TextFormField(
                   controller: destinoOrigemController,
                   decoration: InputDecoration(
-                    hintText: Provider.of<ContaController>(context).tipoSelected == 'Despesa' ? 'Destino' : 'Origem',
+                    hintText:
+                        Provider.of<ContaController>(context).tipoSelected ==
+                                'Despesa'
+                            ? 'Destino'
+                            : 'Origem',
                   ),
                   validator: Validatorless.required('Campo Obrigatório!'),
                 ),
-                
               ],
             ),
           ),
@@ -164,125 +179,6 @@ class ContaController extends ChangeNotifier {
       ),
     );
   }
-
-  // create(BuildContext context, {Conta? oldConta}) {
-  //   var formKey = GlobalKey<FormState>();
-  //   var descricaoController = TextEditingController(text: oldConta?.descricao);
-  //   var valorController =
-  //       TextEditingController(text: oldConta?.valor.toString());
-  //   var destinoOrigemController =
-  //       TextEditingController(text: oldConta?.destinoOrigem);
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text(
-  //         oldConta == null ? 'Nova Conta' : 'Editar Conta',
-  //         textAlign: TextAlign.center,
-  //       ),
-  //       content: Form(
-  //         key: formKey,
-  //         child: SingleChildScrollView(
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               DropdownButtonFormField(
-  //                   items:
-  //                       Provider.of<CategoriaController>(context, listen: false)
-  //                           .categorias
-  //                           .map(
-  //                             (e) => DropdownMenuItem<Categoria>(
-  //                               child: Text(e.nome),
-  //                             ),
-  //                           )
-  //                           .toList(),
-  //                   onChanged: (value) {
-  //                     categoriaSelected = value;
-  //                   }),
-  //               RadioListTile(
-  //                 value: true,
-  //                 groupValue: tipoSelected,
-  //                 onChanged: (value) => tipoSelected = value!,
-  //                 title: const Text('Despesa'),
-  //               ),
-  //               RadioListTile(
-  //                 value: false,
-  //                 groupValue: tipoSelected,
-  //                 onChanged: (value) => tipoSelected = value!,
-  //                 title: const Text('Receita'),
-  //               ),
-  //               // showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(1970), lastDate: DateTime(2100)),
-  //               TextFormField(
-  //                 controller: descricaoController,
-  //                 validator: (value) {
-  //                   if (value == null || value.isEmpty) {
-  //                     return 'Campo Obrigatório!';
-  //                   }
-  //                   return null;
-  //                 },
-  //               ),
-  //               TextFormField(
-  //                 controller: valorController,
-  //                 validator: (value) {
-  //                   if (value == null || value.isEmpty) {
-  //                     return 'Campo Obrigatório!';
-  //                   }
-  //                   return null;
-  //                 },
-  //                 keyboardType: TextInputType.number,
-  //                 inputFormatters: <TextInputFormatter>[
-  //                   FilteringTextInputFormatter.digitsOnly,
-  //                 ],
-  //               ),
-  //               TextFormField(
-  //                 controller: destinoOrigemController,
-  //                 validator: (value) {
-  //                   if (value == null || value.isEmpty) {
-  //                     return 'Campo Obrigatório!';
-  //                   }
-  //                   return null;
-  //                 },
-  //               ),
-  //               RadioListTile(
-  //                 value: statusSelected,
-  //                 groupValue: statusSelected,
-  //                 onChanged: (value) => statusSelected = value!,
-  //                 title: const Text('Pago'),
-  //               ),
-  //               RadioListTile(
-  //                 value: statusSelected,
-  //                 groupValue: statusSelected,
-  //                 onChanged: (value) => statusSelected = value!,
-  //                 title: const Text('Pendente'),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //       actions: [
-  //         ElevatedButton.icon(
-  //           onPressed: () async {
-  //             if (formKey.currentState?.validate() ?? false) {
-  //               var conta = Conta(
-  //                 categoria: categoriaSelected!,
-  //                 tipo: tipoSelected,
-  //                 data: DateTime.now().toString(),
-  //                 descricao: descricaoController.text,
-  //                 valor: double.parse(valorController.text),
-  //                 destinoOrigem: destinoOrigemController.text,
-  //                 status: statusSelected,
-  //               )..id = oldConta?.id;
-  //               oldConta == null ? await save(conta) : await update(conta);
-  //               notifyListeners();
-  //               Navigator.of(context).pop();
-  //             }
-  //           },
-  //           icon: const Icon(Icons.save),
-  //           label: Text(oldConta == null ? 'Salvar' : 'Atualizar'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Future<List<Conta>?> findAll() async {
     var contaRepository = ContaRepository();
@@ -360,6 +256,18 @@ class ContaController extends ChangeNotifier {
       log(e.toString());
     }
     return null;
+  }
+
+  Future<void> selecionarData(BuildContext context) async {
+    final dataSelecionada = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2020),
+        lastDate: DateTime(2100));
+    if (dataSelecionada != null) {
+      dataController.text = DateFormat('dd/MM/yyyy').format(dataSelecionada);
+    }
+    notifyListeners();
   }
 
   edit(BuildContext context, Conta conta) async {

@@ -18,32 +18,32 @@ class HomePage extends StatelessWidget {
       drawer: Drawer(
         child: Column(
           children: [
-            Row(
-              children: [
-                Container(
-                  child: const Row(
-                    children: [
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: CircleAvatar(
-                            radius: 50,
-                            backgroundImage:
-                                AssetImage('assets/images/avatar.jpg')),
-                      ),
-                      Center(
-                        child: Text(
-                          'Bem-Vindo',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                          ),
-                        ),
-                      ),
-                    ],
+            Container(
+              color: Colors.teal,
+              padding: const EdgeInsets.only(top: 20),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: CircleAvatar(
+                        radius: 50,
+                        backgroundImage:
+                            AssetImage('assets/images/avatar.jpg')),
                   ),
-                ),
-              ],
+                  Center(
+                    child: Text(
+                      'Bem-Vindo',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             MenuItemButton(
               style: const ButtonStyle(
